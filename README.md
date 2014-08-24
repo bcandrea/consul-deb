@@ -91,7 +91,7 @@ the key id to `/etc/devscripts.conf` under the debsign stanza:
 
     DEBSIGN_KEYID=FDCCCD6E
 
-Last problem to avoid: the personal package builders cowbuilder and 
+Another problem to avoid: the personal package builders cowbuilder and 
 pbuilder must be allowed to preserve the environment
 when called using `sudo`. Create the file `/etc/sudoers.d/pbuilders` using the command
 
@@ -101,6 +101,23 @@ and put the following two lines into it:
 
     Cmnd_Alias PBUILDERS = /usr/sbin/pbuilder, /usr/sbin/cowbuilder
     ALL ALL=(ALL) SETENV: PBUILDERS
+
+The last issue is the dependency from a relatively recent version of Go. This is
+not a problem on Trusty (14.04), but for Precise the package needs to be fetched from
+a PPA. This can be done easily by logging into the cowbuilder image with
+
+    $ sudo cowbuilder --login --basepath ~/pbuilder/precise-base.cow/ --save-after-login
+
+and adding the line
+
+    deb http://ppa.launchpad.net/bcandrea/backports/ubuntu precise main
+
+to the file `/etc/apt/sources.list` and running
+
+    $ sudo apt-get update
+
+The `--save-after-login` option will ensure our change will be committed to 
+the cowbuilder image after logging off.
 
 ### Setting up Ruby
 
