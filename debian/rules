@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+override_dh_auto_clean:
+	rm -rf usr etc
+
+override_dh_auto_build:
+	export GOPATH=$(CURDIR) && $(MAKE) -C src/github.com/hashicorp/consul
+
+override_dh_auto_install:
+	mkdir -p usr/bin
+	mkdir -p usr/share/consul
+	mkdir -p etc
+	cp -a bin/consul usr/bin
+	cp -a src/github.com/hashicorp/consul/ui/dist usr/share/consul/web-ui
+	cp -a debian/consul.d etc
+
+%:
+	dh $@ 
+
+.PHONY: build
