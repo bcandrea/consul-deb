@@ -80,7 +80,9 @@ Then create the base folder which will be used to setup the chrooted
 environment in which the package will be built:
 
     $ mkdir -p ~/pbuilder/
-    $ sudo cowbuilder --create --distribution precise --components "main restricted universe multiverse" --basepath=$HOME/pbuilder/natty-precise.cow
+    $ sudo cowbuilder --create --distribution precise \
+                      --components "main restricted universe multiverse" \
+                      --basepath=$HOME/pbuilder/precise-base.cow
 
 If you have more than one PGP key in your local keyring (I do), 
 you may also want to specify which one to use when signing 
