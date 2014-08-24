@@ -13,6 +13,15 @@ the `VERSION` variable, e.g.
 
     $ make VERSION=0.3.0
 
+Ubuntu packages built regularly with this Makefile are available at 
+[this Launchpad PPA](https://launchpad.net/~bcandrea/+archive/ubuntu/consul). To 
+install the latest Consul packages on your Ubuntu system you just need to add the 
+repository and update the local sources:
+
+    $ sudo apt-add-repository ppa:bcandrea/consul
+    $ sudo apt-get update
+    $ sudo apt-get install consul consul-web-ui
+
 
 ## Usage
 
@@ -48,6 +57,10 @@ the one installed on the build machine). Here is the complete list:
 
 * `DISTRO`: Select the target codename for the build (e.g. precise, natty).
             Defaults to the codename of the build machine.
+* `VERSION`: Select which release tag to use as a base for the upstream
+             tarball. If not specified, the latest tag will be used.
+* `MODIFIER`: An optional modifier to append to the selected upstream version (e.g.
+              "~beta1"). Not needed in most circumstances.
 * `REVISION`: The debian revision to append to the upstream version. Defaults
               to `1~$(DISTRO)1~ppa1`.
 * `CHANGE`: The message to use in the debian/changelog file for this package.
@@ -108,13 +121,13 @@ a PPA. This can be done easily by logging into the cowbuilder image with
 
     $ sudo cowbuilder --login --basepath ~/pbuilder/precise-base.cow/ --save-after-login
 
-and adding the line
+and adding to the file `/etc/apt/sources.list` the following line:
 
     deb http://ppa.launchpad.net/bcandrea/backports/ubuntu precise main
 
-to the file `/etc/apt/sources.list` and running
+The package index then needs to be updated with the command
 
-    $ sudo apt-get update
+    # apt-get update
 
 The `--save-after-login` option will ensure our change will be committed to 
 the cowbuilder image after logging off.
