@@ -16,7 +16,7 @@
 # the one installed on the build machine).
 # Please see README.md for a more detailed description.
 
-BASE_DIR  = pkg
+BASE_DIR  = $(CURDIR)/pkg
 SRC_DIR   = $(BASE_DIR)/checkout/src/github.com/hashicorp/consul
 DISTRO   ?= $(shell lsb_release -sc)
 REVISION ?= 1~$(DISTRO)1~ppa1
@@ -38,6 +38,7 @@ prepare_src: $(SRC_DIR) get_current_version get_new_version
 	$(eval PKG_DIR = $(BASE_DIR)/consul-$(VERSION))
 	rm -rf $(PKG_DIR)
 	rsync -qav --delete $(BASE_DIR)/checkout/ $(PKG_DIR)
+	export GOPATH=$(PKG_DIR) && make -C $(PKG_DIR)/src/github.com/hashicorp/consul deps
 	make -C $(PKG_DIR)/src/github.com/hashicorp/consul/ui dist
 	tar czf pkg/consul_$(VERSION).orig.tar.gz -C $(BASE_DIR) consul-$(VERSION) 
 	rsync -qav --delete debian/ $(PKG_DIR)/debian
