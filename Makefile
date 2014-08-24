@@ -68,7 +68,7 @@ get_new_version:
 clean:
 	rm -rf pkg/*
 
-upload:
-	@test -z "$(PPA)" && echo "Usage: make upload PPA=<user>/<ppa>"; exit 1
+upload: get_new_version
+	@if test -z "$(PPA)"; then echo "Usage: make upload PPA=<user>/<ppa>"; exit 1; fi
 	dput ppa:$(PPA) $(BASE_DIR)/consul_$(VERSION)-$(REVISION)_source.changes
-	cp $(PKG_DIR)/debian/changelog debian
+	cp $(BASE_DIR)/consul-$(VERSION)/debian/changelog debian
