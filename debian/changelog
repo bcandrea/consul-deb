@@ -1,0 +1,17 @@
+consul (0.3.1+dep0-1~trusty1~ppa1) trusty; urgency=low
+
+  * No-change build for Trusty.
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Mon, 25 Aug 2014 00:16:52 +0100
+
+consul (0.3.1+dep0-1~precise1~ppa1) precise; urgency=low
+
+  * Included all dependencies in the upstream sources.
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Sun, 24 Aug 2014 23:25:26 +0100
+
+consul (0.3.1-1~precise1~ppa1) precise; urgency=low
+
+  * New upstream release.
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Sun, 24 Aug 2014 02:22:34 +0100
