@@ -40,7 +40,7 @@ The available targets are:
 * `build_src`: Builds a source debian package that can be used for uploads to Launchpad.
 * `upload`: Uploads the source package to Launchpad. Requires setting the `PPA` variable on
             the command line (e.g. `make upload PPA=myuser/myppa`).
-*`clean`: Removes everything under `pkg`.
+* `clean`: Removes everything under `pkg`.
 
 As already mentioned, the `VERSION` variable is the easiest way to go back in time
 and produce a package for a different tag:
