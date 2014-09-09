@@ -1,3 +1,15 @@
+consul (0.4.0-1~trusty1~ppa1) trusty; urgency=low
+
+  * No-change build for Trusty.
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Tue, 09 Sep 2014 15:29:40 +0100
+
+consul (0.4.0-1~precise1~ppa1) precise; urgency=low
+
+  * New upstream release.
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Tue, 09 Sep 2014 14:51:23 +0100
+
 consul (0.3.1+dep0-1~trusty1~ppa1) trusty; urgency=low
 
   * No-change build for Trusty.
