@@ -49,10 +49,11 @@ and produce a package for a different tag:
 
 Several other variables are available: for instance,
 
-    $ make DISTRO=trusty
+    $ make CHANGE="No-change build for Trusty." DISTRO=trusty
 
 can be used to change the target distribution (which defaults to
-the one installed on the build machine). Here is the complete list:
+the one installed on the build machine), using a custom changelog message. 
+Here is the complete list:
 
 
 * `DISTRO`: Select the target codename for the build (e.g. precise, natty).

@@ -64,6 +64,7 @@ get_current_version:
 	@echo "--> Current package version: $(CURRENT_VERSION)"
 	
 get_new_version:
+	cd $(SRC_DIR) && git fetch origin --tags
 	$(eval LATEST_TAG = $(shell if [ -z "$(VERSION)" ]; then \
 			cd $(SRC_DIR) && git tag | tail -n1; \
 		else \
