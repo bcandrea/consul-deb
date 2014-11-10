@@ -86,9 +86,9 @@ utopic:
     make DISTRO=precise
     make DISTRO=trusty CHANGE="No-change build for Trusty."
     make DISTRO=utopic CHANGE="No-change build for Utopic."
-    make upload DISTRO=precise
-    make upload DISTRO=trusty
-    make upload DISTRO=utopic
+    make upload DISTRO=precise PPA=myuser/myppa
+    make upload DISTRO=trusty PPA=myuser/myppa
+    make upload DISTRO=utopic PPA=myuser/myppa
 
 ## Prerequisites
 
