@@ -9,9 +9,6 @@ script
   # Make sure to use all our CPUs, because Consul can block a scheduler thread
   export GOMAXPROCS=`nproc`
 
-  # Get the public IP of the first ethernet interface
-  BIND=`ifconfig eth0 | grep "inet addr" | awk '{ print substr($2,6) }'`
-
   # Allow overriding env vars in /etc/default/consul
   if [ -f "/etc/default/consul" ]; then
     . /etc/default/consul
@@ -19,6 +16,5 @@ script
   
   exec /usr/bin/consul agent \
     -config-dir="/etc/consul.d" \
-    -bind=$BIND \
     ${CONSUL_FLAGS}
 end script
