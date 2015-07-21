@@ -6,7 +6,7 @@ Homepage: http://www.consul.io
 Vcs-Git: https://github.com/hashicorp/consul.git
 Vcs-Browser: https://github.com/hashicorp/consul
 Standards-Version: 3.9.3
-Build-Depends: debhelper (>= 9), golang-go (>= 2:1.2), git
+Build-Depends: debhelper (>= 9), golang-go (>= 2:1.2) | go (>= 1.2), git, dh-systemd
 
 Package: consul
 Architecture: any
@@ -14,7 +14,7 @@ Suggests: consul-web-ui
 Depends: ${misc:Depends}
 Description: A tool for discovering and configuring services - main package
  Consul is a tool for service discovery and configuration. Consul is
- distributed, highly available, and extremely scalable. Consul provides 
+ distributed, highly available, and extremely scalable. Consul provides
  several key features:
  * Service Discovery - Consul makes it simple for services to register
    themselves and to discover other services via a DNS or HTTP interface.
@@ -38,7 +38,7 @@ Architecture: all
 Depends: consul, ${misc:Depends}
 Description: A tool for discovering and configuring services - web user interface
  Consul is a tool for service discovery and configuration. Consul is
- distributed, highly available, and extremely scalable. Consul provides 
+ distributed, highly available, and extremely scalable. Consul provides
  several key features:
  * Service Discovery - Consul makes it simple for services to register
    themselves and to discover other services via a DNS or HTTP interface.

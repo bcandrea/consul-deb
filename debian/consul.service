@@ -1,0 +1,15 @@
+[Unit]
+Description=Consul agent
+
+[Service]
+Type=simple
+Environment=GOMAXPROCS=2
+EnvironmentFile=/etc/default/consul
+ExecStart=/usr/bin/consul agent -config-dir=/etc/consul.d $CONSUL_FLAGS
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=multi-user.target
