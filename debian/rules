@@ -10,20 +10,20 @@
 #export DH_VERBOSE=1
 
 override_dh_auto_clean:
-	rm -rf usr etc
+	rm -rf bin
 
-override_dh_auto_build:
-	export GOPATH=$(CURDIR) && $(MAKE) -C src/github.com/hashicorp/consul
+#override_dh_auto_build:
+#	export GOPATH=$(CURDIR) && $(MAKE) -C src/github.com/hashicorp/consul
 
 override_dh_auto_install:
 	mkdir -p usr/bin
 	mkdir -p usr/share/consul
 	mkdir -p etc
 	cp -a bin/consul usr/bin
-	cp -a src/github.com/hashicorp/consul/ui/dist usr/share/consul/web-ui
 	cp -a debian/consul.d etc
+#	cp -a src/github.com/hashicorp/consul/ui/dist usr/share/consul/web-ui
 
 %:
-	dh $@ 
+	dh $@
 
 .PHONY: build
