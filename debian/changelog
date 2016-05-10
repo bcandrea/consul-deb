@@ -1,3 +1,9 @@
+consul (0.6.4-1~precise1~ppa1) precise; urgency=low
+
+  * New upstream release.
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Tue, 10 May 2016 16:01:58 +0000
+
 consul (0.4.1-1~utopic1~ppa1) utopic; urgency=low
 
   * No-change build for Utopic.
