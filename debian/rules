@@ -10,19 +10,16 @@
 #export DH_VERBOSE=1
 
 override_dh_auto_clean:
-	rm -rf bin
+	rm -rf /go/bin/consul
 
 override_dh_auto_build:
-	go build \
-    -ldflags "-X main.GitCommit $${GIT_COMMIT} -X main.GitDescribe $${GIT_DESCRIBE}" \
-    -output "bin/consul" \
-	  .
+	go install -ldflags "-X main.GitCommit $${GIT_COMMIT} -X main.GitDescribe $${GIT_DESCRIBE}"
 
 override_dh_auto_install:
 	mkdir -p usr/bin
 	mkdir -p usr/share/consul
 	mkdir -p etc
-	cp -a bin/consul usr/bin
+	cp -a /go/bin/consul usr/bin
 	cp -a debian/consul.d etc
 
 %:
