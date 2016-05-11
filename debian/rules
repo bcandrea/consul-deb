@@ -13,7 +13,8 @@ override_dh_auto_clean:
 	rm -rf /go/bin/consul
 
 override_dh_auto_build:
-	go install -ldflags "-X main.GitCommit $${GIT_COMMIT} -X main.GitDescribe $${GIT_DESCRIBE}"
+	GO15VENDOREXPERIMENT=1 go install \
+			-ldflags "-X main.GitCommit $${GIT_COMMIT} -X main.GitDescribe $${GIT_DESCRIBE}"
 
 override_dh_auto_install:
 	mkdir -p usr/bin
