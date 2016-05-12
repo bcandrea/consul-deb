@@ -14,7 +14,11 @@ override_dh_auto_clean:
 
 override_dh_auto_build:
 	mkdir -p usr/bin
-	go build -ldflags "-X main.GitCommit $${GIT_COMMIT} -X main.GitDescribe $${GIT_DESCRIBE}" -o usr/bin/consul .
+	pushd $$GOPATH/github.com/hashicorp/consul && \
+		go build -ldflags "-X main.GitCommit=$${GIT_COMMIT} -X main.GitDescribe=$${GIT_DESCRIBE}" \
+		-o $(CURDIR)/usr/bin/consul .
+
+override_dh_auto_test:
 
 override_dh_auto_install:
 	mkdir -p usr/share/consul
