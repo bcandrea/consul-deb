@@ -13,9 +13,11 @@ override_dh_auto_clean:
 	rm -rf usr/bin usr/share etc
 
 override_dh_auto_build:
+	which go || ln -sf /usr/lib/go-1.6/bin/go* /usr/bin/
 	mkdir -p usr/bin
 	go build -ldflags "-X main.GitCommit=$${GIT_COMMIT} -X main.GitDescribe=$${GIT_DESCRIBE}" \
-		-o $(CURDIR)/usr/bin/consul github.com/hashicorp/consul
+		-o usr/bin/consul github.com/hashicorp/consul
+	ln -sf CHANGELOG.md changelog
 
 override_dh_auto_test:
 

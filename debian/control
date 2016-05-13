@@ -12,22 +12,22 @@ Package: consul
 Architecture: any
 Suggests: consul-web-ui
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: A tool for discovering and configuring services - main package
+Description: service discovery and configuration tool - main package
  Consul is a tool for service discovery and configuration. Consul is
  distributed, highly available, and extremely scalable. Consul provides
  several key features:
- * Service Discovery - Consul makes it simple for services to register
-   themselves and to discover other services via a DNS or HTTP interface.
-   External services such as SaaS providers can be registered as well.
- * Health Checking - Health Checking enables Consul to quickly alert
-   operators about any issues in a cluster. The integration with service
-   discovery prevents routing traffic to unhealthy hosts and enables service
-   level circuit breakers.
- * Key/Value Storage - A flexible key/value store enables storing
-   dynamic configuration, feature flagging, coordination, leader election and
-   more. The simple HTTP API makes it easy to use anywhere.
- * Multi-Datacenter - Consul is built to be datacenter aware, and can
-   support any number of regions without complex configuration.
+  * Service Discovery - Consul makes it simple for services to register
+    themselves and to discover other services via a DNS or HTTP interface.
+    External services such as SaaS providers can be registered as well.
+  * Health Checking - Health Checking enables Consul to quickly alert
+    operators about any issues in a cluster. The integration with service
+    discovery prevents routing traffic to unhealthy hosts and enables service
+    level circuit breakers.
+  * Key/Value Storage - A flexible key/value store enables storing
+    dynamic configuration, feature flagging, coordination, leader election and
+    more. The simple HTTP API makes it easy to use anywhere.
+  * Multi-Datacenter - Consul is built to be datacenter aware, and can
+    support any number of regions without complex configuration.
  .
  This is the main package. It installs the consul binary, which is the only
  required component on both client and server nodes.
@@ -36,22 +36,22 @@ Package: consul-web-ui
 Section: utils
 Architecture: all
 Depends: consul, ${misc:Depends}
-Description: A tool for discovering and configuring services - web user interface
+Description: service discovery and configuration tool - web user interface
  Consul is a tool for service discovery and configuration. Consul is
  distributed, highly available, and extremely scalable. Consul provides
  several key features:
- * Service Discovery - Consul makes it simple for services to register
-   themselves and to discover other services via a DNS or HTTP interface.
-   External services such as SaaS providers can be registered as well.
- * Health Checking - Health Checking enables Consul to quickly alert
-   operators about any issues in a cluster. The integration with service
-   discovery prevents routing traffic to unhealthy hosts and enables service
-   level circuit breakers.
- * Key/Value Storage - A flexible key/value store enables storing
-   dynamic configuration, feature flagging, coordination, leader election and
-   more. The simple HTTP API makes it easy to use anywhere.
- * Multi-Datacenter - Consul is built to be datacenter aware, and can
-   support any number of regions without complex configuration.
+  * Service Discovery - Consul makes it simple for services to register
+    themselves and to discover other services via a DNS or HTTP interface.
+    External services such as SaaS providers can be registered as well.
+  * Health Checking - Health Checking enables Consul to quickly alert
+    operators about any issues in a cluster. The integration with service
+    discovery prevents routing traffic to unhealthy hosts and enables service
+    level circuit breakers.
+  * Key/Value Storage - A flexible key/value store enables storing
+    dynamic configuration, feature flagging, coordination, leader election and
+    more. The simple HTTP API makes it easy to use anywhere.
+  * Multi-Datacenter - Consul is built to be datacenter aware, and can
+    support any number of regions without complex configuration.
  .
  This package contains a web user interface that can be used to monitor the
  network of consul nodes.
