@@ -17,7 +17,7 @@ override_dh_auto_build:
 	mkdir -p usr/bin
 	go build -ldflags "-X main.GitCommit=$${GIT_COMMIT} -X main.GitDescribe=$${GIT_DESCRIBE}" \
 		-o usr/bin/consul github.com/hashicorp/consul
-	ln -sf CHANGELOG.md changelog
+	cp CHANGELOG.md changelog && gzip -9 changelog
 
 override_dh_auto_test:
 
