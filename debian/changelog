@@ -1,4 +1,4 @@
-consul (0.6.4-1~precise1~ppa1) precise; urgency=low
+consul (0.6.4-1~trusty1~ppa1) trusty; urgency=low
 
   * New upstream release.
 
