@@ -3,7 +3,7 @@
 
 # The default value for GOMAXPROCS (# of CPUs) can be
 # overridden explicitly here.
-#export GOMAXPROCS=2
+#GOMAXPROCS=2
 
 # The BIND variable can be used to specify the IP address
 # to be used for cluster communication. It defaults to the

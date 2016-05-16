@@ -24,6 +24,6 @@ override_dh_auto_install:
 	cp -a debian/consul.d etc
 
 %:
-	dh $@ 
+	dh $@
 
 .PHONY: build

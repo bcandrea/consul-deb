@@ -13,7 +13,7 @@ script
   if [ -f "/etc/default/consul" ]; then
     . /etc/default/consul
   fi
-  
+
   exec /usr/bin/consul agent \
     -config-dir="/etc/consul.d" \
     ${CONSUL_FLAGS}
