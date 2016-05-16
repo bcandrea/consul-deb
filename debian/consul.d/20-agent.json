@@ -1,3 +1,4 @@
 {
-  "data_dir": "/var/lib/consul"
+  "data_dir": "/var/lib/consul",
+  "syslog": true
 }
