@@ -14,7 +14,7 @@ override_dh_auto_clean:
 
 override_dh_auto_build:
 	mkdir -p go/src/github.com/hasicorp go/pkg usr/bin
-	ln -sf $(CURDIR) go/src/github.com/hasicorp/consul
+	ln -sf $(CURDIR) go/src/github.com/hashicorp/consul
 	PATH=$$PATH:/usr/lib/go-1.6/bin GOPATH=$(CURDIR)/go \
 		go build \
 		-ldflags "-X main.GitCommit=$${GIT_COMMIT} -X main.GitDescribe=$${GIT_DESCRIBE}" \
