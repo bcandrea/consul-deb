@@ -6,7 +6,7 @@ Homepage: http://www.consul.io
 Vcs-Git: https://github.com/hashicorp/consul.git
 Vcs-Browser: https://github.com/hashicorp/consul
 Standards-Version: 3.9.8
-Build-Depends: debhelper (>= 9), golang-go (>= 2:1.2) | go (>= 1.2), git, dh-systemd
+Build-Depends: debhelper (>= 9), golang-go (>= 2:1.6) | golang-1.6-go, git, dh-systemd
 
 Package: consul
 Architecture: any
