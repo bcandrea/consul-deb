@@ -10,12 +10,14 @@
 #export DH_VERBOSE=1
 
 override_dh_auto_clean:
-	rm -rf usr/bin usr/share etc
+	rm -rf go usr/bin usr/share etc
 
 override_dh_auto_build:
-	which go || ln -sf /usr/lib/go-1.6/bin/go* /usr/bin/
-	mkdir -p usr/bin
-	go build -ldflags "-X main.GitCommit=$${GIT_COMMIT} -X main.GitDescribe=$${GIT_DESCRIBE}" \
+	mkdir -p go/src/github.com/hasicorp go/pkg usr/bin
+	ln -sf $(CURDIR) go/src/github.com/hasicorp/consul
+	PATH=$$PATH:/usr/lib/go-1.6/bin GOPATH=$(CURDIR)/go \
+		go build \
+		-ldflags "-X main.GitCommit=$${GIT_COMMIT} -X main.GitDescribe=$${GIT_DESCRIBE}" \
 		-o usr/bin/consul github.com/hashicorp/consul
 	cp CHANGELOG.md changelog && gzip -9 changelog
 
