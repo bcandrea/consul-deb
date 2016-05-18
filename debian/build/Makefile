@@ -46,7 +46,7 @@ login: version tools
 upload: version tools
 	@sh -c 'test -n "$(PPA)" || (echo "Please specify a PPA name, e.g. make upload PPA=myuser/myppa"; false)'
 	$(MAKE) runcontainer CONTAINER_CMD="dput -f ppa:$(PPA) /tmp/consul-deb/consul_$(DEB_VERSION)_source.changes" && \
-		git tag v$(DEB_VERSION)
+		git tag v$(shell echo $(DEB_VERSION) | tr '~' '_' )
 
 runcontainer:
 	mkdir -p /tmp/consul-deb

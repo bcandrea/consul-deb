@@ -1,4 +1,4 @@
-consul (0.6.4-1~wily~ppa1) wily; urgency=medium
+consul (0.6.4-1~wily1~ppa1) wily; urgency=medium
 
   * No-change build for Wily.
 
