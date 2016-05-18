@@ -26,11 +26,14 @@ image locally and executes `gbp buildpackage` in it. Results will be saved to
     consul_0.6.4.orig.tar.gz
 
 This repository is tagged with upstream versions (e.g., `v0.6.4`), which point
-to the commits from the `upstream` branch, and debian package versions
-(e.g. `v0.6.4-1~trusty1~ppa1`). You can build a specific version of the package
-by checking out the relevant tag:
+to the commits from the `upstream` branch, and Debian package versions (e.g.
+`v0.6.4-1_trusty1_ppa1`). Since the tilde (`~`) character is not legal in git
+tags, Debian revision tags use underscore instead (the tag in the example points
+to version `0.6.4-1~trusty1~ppa1`). You can build a specific version of the
+package by checking out the relevant tag:
 
-    $ git checkout v0.6.4-1~trusty1~ppa1
+    $ # ==> build version 0.6.4-1~trusty1~ppa1
+    $ git checkout v0.6.4-1_trusty1_ppa1
     $ make -C debian/build
 
 Ubuntu packages built regularly with this Makefile are available at
