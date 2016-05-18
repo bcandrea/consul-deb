@@ -9,7 +9,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
     GIT_DESCRIBE=v${VERSION} \
     GIT_BUILDPACKAGE_OPTIONS=
 
-RUN apt-get update && apt-get install -y equivs ubuntu-dev-tools git-buildpackage
+RUN apt-get update && \
+    apt-get install -y equivs ubuntu-dev-tools git-buildpackage software-properties-common && \
+    apt-add-repository ppa:ubuntu-lxc/lxd-stable && \
+    apt-get update
 
 COPY build.sh /build.sh
 CMD /bin/bash /build.sh
