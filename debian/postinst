@@ -1,0 +1,22 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    configure)
+
+      # Create consul user
+      if ! getent passwd consul > /dev/null 2>&1
+      then
+        adduser --system --group --quiet \
+          --no-create-home --home /nonexistent \
+          --shell /usr/sbin/nologin \
+          --gecos "Consul service discovery" consul
+      fi
+
+      chown -R consul: /etc/consul.d
+
+    ;;
+esac
+
+#DEBHELPER#
