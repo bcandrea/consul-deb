@@ -1,5 +1,7 @@
 [Unit]
 Description=Consul agent
+After=network.target
+Documentation=man:consul(1)
 
 [Service]
 Type=simple

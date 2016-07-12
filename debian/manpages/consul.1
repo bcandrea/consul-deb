@@ -1,0 +1,117 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "CONSUL" "1" "2016-05-30" "" ""
+.
+.SH "NAME"
+\fBconsul\fR \- Service discovery and configuration tool
+.
+.SH "SYNOPSIS"
+\fBconsul\fR [\-\-version] [\-\-help] \fIcommand\fR [\fIargs\fR]
+.
+.SH "DESCRIPTION"
+Consul is a tool for service discovery and configuration\. Consul is distributed, highly available, and extremely scalable\. Consul provides several key features:
+.
+.IP "\(bu" 4
+Service Discovery \- Consul makes it simple for services to register themselves and to discover other services via a DNS or HTTP interface\. External services such as SaaS providers can be registered as well\.
+.
+.IP "\(bu" 4
+Health Checking \- Health Checking enables Consul to quickly alert operators about any issues in a cluster\. The integration with service discovery prevents routing traffic to unhealthy hosts and enables service level circuit breakers\.
+.
+.IP "\(bu" 4
+Key/Value Storage \- A flexible key/value store enables storing dynamic configuration, feature flagging, coordination, leader election and more\. The simple HTTP API makes it easy to use anywhere\.
+.
+.IP "\(bu" 4
+Multi\-Datacenter \- Consul is built to be datacenter aware, and can support any number of regions without complex configuration\.
+.
+.IP "" 0
+.
+.SH "COMMANDS"
+.
+.TP
+\fBagent\fR
+Runs a Consul agent
+.
+.TP
+\fBconfigtest\fR
+Validate config file
+.
+.TP
+\fBevent\fR
+Fire a new event
+.
+.TP
+\fBexec\fR
+Executes a command on Consul nodes
+.
+.TP
+\fBforce\-leave\fR
+Forces a member of the cluster to enter the "left" state
+.
+.TP
+\fBinfo\fR
+Provides debugging information for operators
+.
+.TP
+\fBjoin\fR
+Tell Consul agent to join cluster
+.
+.TP
+\fBkeygen\fR
+Generates a new encryption key
+.
+.TP
+\fBkeyring\fR
+Manages gossip layer encryption keys
+.
+.TP
+\fBleave\fR
+Gracefully leaves the Consul cluster and shuts down
+.
+.TP
+\fBlock\fR
+Execute a command holding a lock
+.
+.TP
+\fBmaint\fR
+Controls node or service maintenance mode
+.
+.TP
+\fBmembers\fR
+Lists the members of a Consul cluster
+.
+.TP
+\fBmonitor\fR
+Stream logs from a Consul agent
+.
+.TP
+\fBreload\fR
+Triggers the agent to reload configuration files
+.
+.TP
+\fBrtt\fR
+Estimates network round trip time between nodes
+.
+.TP
+\fBversion\fR
+Prints the Consul version
+.
+.TP
+\fBwatch\fR
+Watch for changes in Consul
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show this help message and exit
+.
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Print Consul version and exit
+.
+.SH "COPYRIGHT"
+Consul is subject to the terms of the Mozilla Public License, v\. 2\.0\. (MPL\-2\.0)
+.
+.SH "SEE ALSO"
+Consul online documentation is available on this website https://www\.consul\.io/docs/
