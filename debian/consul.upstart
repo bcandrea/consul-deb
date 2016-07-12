@@ -8,13 +8,17 @@ respawn
 script
   # Make sure to use all our CPUs, because Consul can block a scheduler thread
   export GOMAXPROCS=`nproc`
+  USER="consul"
+  GROUP="consul"
+  OPTS="agent -config-dir="/etc/consul.d ${CONSUL_FLAGS}"
 
   # Allow overriding env vars in /etc/default/consul
   if [ -f "/etc/default/consul" ]; then
     . /etc/default/consul
   fi
 
-  exec /usr/bin/consul agent \
-    -config-dir="/etc/consul.d" \
-    ${CONSUL_FLAGS}
+  setuid $USER
+  setgid $GROUP
+  exec /usr/bin/consul $OPTS
+
 end script
