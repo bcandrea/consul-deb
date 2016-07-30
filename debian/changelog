@@ -1,3 +1,12 @@
+consul (0.6.4-2~trusty1~ppa1) trusty; urgency=low
+
+  * Fix some lintian warning/errors (thanks Sebastien Badia)
+  * d/postinst: Do not run consul and consul-web as uid 0 (thanks Sebastien
+    Badia)
+  * fix `enable_syslog` configuration parameter (thanks Nikita K.)
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Sat, 30 Jul 2016 23:07:27 +0000
+
 consul (0.6.4-1~xenial1~ppa1) xenial; urgency=low
 
   * No-change build for Xenial.
