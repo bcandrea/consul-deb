@@ -1,3 +1,9 @@
+consul (0.6.4-2~xenial1~ppa1) xenial; urgency=low
+
+  * No-change build for Xenial.
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Sun, 31 Jul 2016 00:18:52 +0000
+
 consul (0.6.4-2~wily1~ppa1) wily; urgency=low
 
   * No-change build for Wily.
