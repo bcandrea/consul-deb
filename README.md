@@ -1,4 +1,5 @@
 # A debian package for Consul
+[![Build Status](https://semaphoreci.com/api/v1/bcandrea/consul-deb/branches/debian/badge.svg)](https://semaphoreci.com/bcandrea/consul-deb)
 
 ## Overview
 
