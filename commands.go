@@ -22,6 +22,7 @@ func init() {
 				Revision:          GitCommit,
 				Version:           Version,
 				VersionPrerelease: VersionPrerelease,
+				HumanVersion:      GetHumanVersion(),
 				Ui:                ui,
 				ShutdownCh:        make(chan struct{}),
 			}, nil
@@ -102,6 +103,12 @@ func init() {
 			}, nil
 		},
 
+		"operator": func() (cli.Command, error) {
+			return &command.OperatorCommand{
+				Ui: ui,
+			}, nil
+		},
+
 		"info": func() (cli.Command, error) {
 			return &command.InfoCommand{
 				Ui: ui,
@@ -121,20 +128,9 @@ func init() {
 		},
 
 		"version": func() (cli.Command, error) {
-			ver := Version
-			rel := VersionPrerelease
-			if GitDescribe != "" {
-				ver = GitDescribe
-			}
-			if GitDescribe == "" && rel == "" {
-				rel = "dev"
-			}
-
 			return &command.VersionCommand{
-				Revision:          GitCommit,
-				Version:           ver,
-				VersionPrerelease: rel,
-				Ui:                ui,
+				HumanVersion: GetHumanVersion(),
+				Ui:           ui,
 			}, nil
 		},
 
