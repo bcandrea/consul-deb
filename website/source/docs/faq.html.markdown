@@ -35,7 +35,7 @@ See the [Atlas integration guide](/docs/guides/atlas.html) for more details.
 
 ## Q: Does Consul rely on UDP Broadcast or Multicast?
 
-Consul uses the [Serf](https://www.serfdom.io) gossip protocol which relies on
+Consul uses the [Serf](https://www.serf.io) gossip protocol which relies on
 TCP and UDP unicast. Broadcast and Multicast are rarely available in a multi-tenant
 or cloud network environment. For that reason, Consul and Serf were both
 designed to avoid any dependence on those capabilities.
@@ -78,3 +78,7 @@ read and compute the delta client side.
 By design, Consul offloads this to clients instead of attempting to support
 the delta calculation. This avoids expensive state maintenance on the servers
 as well as race conditions between data updates and watch registrations.
+
+## Q: What network ports does Consul use?
+
+The [Ports Used](https://www.consul.io/docs/agent/options.html#ports) section of the Configuration documentation lists all ports that Consul uses.
