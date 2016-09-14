@@ -1,3 +1,9 @@
+consul (0.7.0-1~xenial1~ppa1) xenial; urgency=medium
+
+  * New upstream release.
+
+ -- Sebastien Badia <seb@sebian.fr>  Thu, 15 Sep 2016 01:06:07 +0200
+
 consul (0.6.4-2~xenial1~ppa1) xenial; urgency=low
 
   * No-change build for Xenial.
