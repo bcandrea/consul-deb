@@ -70,6 +70,7 @@ query, like this example:
   "Name": "my-query",
   "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e",
   "Token": "",
+  "Near": "node1",
   "Service": {
     "Service": "redis",
     "Failover": {
@@ -113,6 +114,16 @@ their captured `Token` field. Capturing ACL Tokens is analogous to
 attribute which can be set on functions. This change in effect moves Consul
 from using `SECURITY DEFINER` by default to `SECURITY INVOKER` by default for
 new Prepared Queries.
+
+<a name="near"></a>
+`Near` allows specifying a particular node to sort near based on distance
+sorting using [Network Coordinates](/docs/internals/coordinates.html). The
+nearest instance to the specified node will be returned first, and subsequent
+nodes in the response will be sorted in ascending order of estimated round-trip
+times. If the node given does not exist, the nodes in the response will
+be shuffled. Using the magic `_agent` value is supported, and will automatically
+return results nearest the agent servicing the request. If unspecified, the
+response will be shuffled by default. This was added in Consul 0.7.
 
 The set of fields inside the `Service` structure define the query's behavior.
 
@@ -212,20 +223,20 @@ that several interpolation variables are available to dynamically populate the q
 before it is executed. All of the string fields inside the `Service` structure are
 interpolated, with the following variables available:
 
-`${name.full}` has the entire name that was queried. For example, a lookup for
-"geo-db-customer-master.consul" in the example above would set this variable to
+`${name.full}` has the entire name that was queried. For example, a DNS lookup for
+"geo-db-customer-master.query.consul" in the example above would set this variable to
 "geo-db-customer-master".
 
 `${name.prefix}` has the prefix that matched. This would always be "geo-db" for
 the example above.
 
-`${name.suffix}` has the suffix after the prefix. For example, a lookup for
-"geo-db-customer-master.consul" in the example above would set this variable to
+`${name.suffix}` has the suffix after the prefix. For example, a DNS lookup for
+"geo-db-customer-master.query.consul" in the example above would set this variable to
 "-customer-master".
 
 `${match(N)}` returns the regular expression match at the given index N. The
 0 index will have the entire match, and >0 will have the results of each match
-group. For example, a lookup for "geo-db-customer-master.consul" in the example
+group. For example, a DNS lookup for "geo-db-customer-master.query.consul" in the example
 above with a `Regexp` field set to `^geo-db-(.*?)-([^\-]+?)$` would return
 "geo-db-customer-master" for `${match(0)}`, "customer" for `${match(1)}`, and
 "master" for `${match(2)}`. If the regular expression doesn't match, or an invalid
@@ -240,22 +251,24 @@ applies a failover policy to it:
 
 ```javascript
 {
-  "Name": "",
-  "Template" {
-    "Type": "name_prefix_match",
-  },
-  "Service": {
-    "Service": "${name.full}",
-    "Failover": {
-      "NearestN": 3,
-    }
-  }
+	"Name": "",
+	"Template": {
+		"Type": "name_prefix_match"
+	},
+	"Service": {
+		"Service": "${name.full}",
+		"Failover": {
+			"NearestN": 3
+		}
+	}
 }
 ```
 
 This will match any lookup for `*.query.consul` and will attempt to find the
 service locally, and otherwise attempt to find that service in the next three
-closest datacenters.
+closest datacenters. If ACLs are enabled, a catch-all template like this with
+an empty `Name` requires an ACL token that can write to any query prefix. Also,
+only a single catch-all template can be registered at any time.
 
 #### GET Method
 
@@ -363,8 +376,9 @@ blocking queries, but it does support all consistency modes.
 Adding the optional "?near=" parameter with a node name will sort the resulting
 list in ascending order based on the estimated round trip time from that node.
 Passing "?near=_agent" will use the agent's node for the sort. If this is not
-present, then the nodes will be shuffled randomly and will be in a different
-order each time the query is executed.
+present, the default behavior will shuffle the nodes randomly each time the
+query is executed. Passing this option will override the built-in
+<a href="#near">near parameter</a> of a prepared query, if present.
 
 An optional "?limit=" parameter can be used to limit the size of the list to
 the given number of nodes. This is applied after any sorting or shuffling.
@@ -385,7 +399,11 @@ a JSON body will be returned like this:
     {
       "Node": {
         "Node": "foobar",
-        "Address": "10.1.10.12"
+        "Address": "10.1.10.12",
+        "TaggedAddresses": {
+          "lan": "10.1.10.12",
+          "wan": "10.1.10.12"
+        }
       },
       "Service": {
         "ID": "redis",

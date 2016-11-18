@@ -3,8 +3,6 @@ package agent
 import (
 	"errors"
 	"fmt"
-	"github.com/hashicorp/consul/testutil"
-	"github.com/hashicorp/serf/serf"
 	"io"
 	"io/ioutil"
 	"net"
@@ -14,6 +12,10 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/hashicorp/consul/logger"
+	"github.com/hashicorp/consul/testutil"
+	"github.com/hashicorp/serf/serf"
 )
 
 type rpcParts struct {
@@ -37,9 +39,12 @@ func testRPCClient(t *testing.T) *rpcParts {
 }
 
 func testRPCClientWithConfig(t *testing.T, cb func(c *Config)) *rpcParts {
-	lw := NewLogWriter(512)
+	lw := logger.NewLogWriter(512)
 	mult := io.MultiWriter(os.Stderr, lw)
 
+	configTry := 0
+RECONF:
+	configTry += 1
 	conf := nextConfig()
 	cb(conf)
 
@@ -50,6 +55,9 @@ func testRPCClientWithConfig(t *testing.T, cb func(c *Config)) *rpcParts {
 
 	l, err := net.Listen(rpcAddr.Network(), rpcAddr.String())
 	if err != nil {
+		if configTry < 3 {
+			goto RECONF
+		}
 		t.Fatalf("err: %s", err)
 	}
 

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/hashicorp/consul/logger"
 	"github.com/hashicorp/consul/testutil"
 	"github.com/mitchellh/cli"
 )
@@ -110,28 +111,108 @@ func TestRetryJoin(t *testing.T) {
 }
 
 func TestReadCliConfig(t *testing.T) {
-
-	shutdownCh := make(chan struct{})
-	defer close(shutdownCh)
-
 	tmpDir, err := ioutil.TempDir("", "consul")
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
+	defer os.RemoveAll(tmpDir)
 
-	cmd := &Command{
-		args: []string{
-			"-data-dir", tmpDir,
-			"-node", `"a"`,
-			"-advertise-wan", "1.2.3.4",
-		},
-		ShutdownCh: shutdownCh,
-		Ui:         new(cli.MockUi),
+	shutdownCh := make(chan struct{})
+	defer close(shutdownCh)
+
+	// Test config parse
+	{
+		cmd := &Command{
+			args: []string{
+				"-data-dir", tmpDir,
+				"-node", `"a"`,
+				"-advertise-wan", "1.2.3.4",
+				"-serf-wan-bind", "4.3.2.1",
+				"-serf-lan-bind", "4.3.2.2",
+			},
+			ShutdownCh: shutdownCh,
+			Ui:         new(cli.MockUi),
+		}
+
+		config := cmd.readConfig()
+		if config.AdvertiseAddrWan != "1.2.3.4" {
+			t.Fatalf("expected -advertise-addr-wan 1.2.3.4 got %s", config.AdvertiseAddrWan)
+		}
+		if config.SerfWanBindAddr != "4.3.2.1" {
+			t.Fatalf("expected -serf-wan-bind 4.3.2.1 got %s", config.SerfWanBindAddr)
+		}
+		if config.SerfLanBindAddr != "4.3.2.2" {
+			t.Fatalf("expected -serf-lan-bind 4.3.2.2 got %s", config.SerfLanBindAddr)
+		}
 	}
 
-	config := cmd.readConfig()
-	if config.AdvertiseAddrWan != "1.2.3.4" {
-		t.Fatalf("expected -advertise-addr-wan 1.2.3.4 got %s", config.AdvertiseAddrWan)
+	// Test LeaveOnTerm and SkipLeaveOnInt defaults for server mode
+	{
+		ui := new(cli.MockUi)
+		cmd := &Command{
+			args: []string{
+				"-node", `"server1"`,
+				"-server",
+				"-data-dir", tmpDir,
+			},
+			ShutdownCh: shutdownCh,
+			Ui:         ui,
+		}
+
+		config := cmd.readConfig()
+		if config == nil {
+			t.Fatalf(`Expected non-nil config object: %s`, ui.ErrorWriter.String())
+		}
+		if config.Server != true {
+			t.Errorf(`Expected -server to be true`)
+		}
+		if (*config.LeaveOnTerm) != false {
+			t.Errorf(`Expected LeaveOnTerm to be false in server mode`)
+		}
+		if (*config.SkipLeaveOnInt) != true {
+			t.Errorf(`Expected SkipLeaveOnInt to be true in server mode`)
+		}
+	}
+
+	// Test LeaveOnTerm and SkipLeaveOnInt defaults for client mode
+	{
+		ui := new(cli.MockUi)
+		cmd := &Command{
+			args: []string{
+				"-data-dir", tmpDir,
+				"-node", `"client"`,
+			},
+			ShutdownCh: shutdownCh,
+			Ui:         ui,
+		}
+
+		config := cmd.readConfig()
+		if config == nil {
+			t.Fatalf(`Expected non-nil config object: %s`, ui.ErrorWriter.String())
+		}
+		if config.Server != false {
+			t.Errorf(`Expected server to be false`)
+		}
+		if (*config.LeaveOnTerm) != true {
+			t.Errorf(`Expected LeaveOnTerm to be true in client mode`)
+		}
+		if *config.SkipLeaveOnInt != false {
+			t.Errorf(`Expected SkipLeaveOnInt to be false in client mode`)
+		}
+	}
+
+	// Test empty node name
+	{
+		cmd := &Command{
+			args:       []string{"-node", `""`},
+			ShutdownCh: shutdownCh,
+			Ui:         new(cli.MockUi),
+		}
+
+		config := cmd.readConfig()
+		if config != nil {
+			t.Errorf(`Expected -node="" to fail`)
+		}
 	}
 }
 
@@ -194,6 +275,36 @@ func TestRetryJoinWanFail(t *testing.T) {
 	}
 }
 
+func TestDiscoverEC2Hosts(t *testing.T) {
+	if os.Getenv("AWS_REGION") == "" {
+		t.Skip("AWS_REGION not set, skipping")
+	}
+
+	if os.Getenv("AWS_ACCESS_KEY_ID") == "" {
+		t.Skip("AWS_ACCESS_KEY_ID not set, skipping")
+	}
+
+	if os.Getenv("AWS_SECRET_ACCESS_KEY") == "" {
+		t.Skip("AWS_SECRET_ACCESS_KEY not set, skipping")
+	}
+
+	c := &Config{
+		RetryJoinEC2: RetryJoinEC2{
+			Region:   os.Getenv("AWS_REGION"),
+			TagKey:   "ConsulRole",
+			TagValue: "Server",
+		},
+	}
+
+	servers, err := c.discoverEc2Hosts(&log.Logger{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(servers) != 3 {
+		t.Fatalf("bad: %v", servers)
+	}
+}
+
 func TestSetupAgent_RPCUnixSocket_FileExists(t *testing.T) {
 	conf := nextConfig()
 	tmpDir, err := ioutil.TempDir("", "consul")
@@ -227,7 +338,7 @@ func TestSetupAgent_RPCUnixSocket_FileExists(t *testing.T) {
 		Ui:         new(cli.MockUi),
 	}
 
-	logWriter := NewLogWriter(512)
+	logWriter := logger.NewLogWriter(512)
 	logOutput := new(bytes.Buffer)
 
 	// Ensure the server is created
@@ -270,10 +381,6 @@ func TestSetupScadaConn(t *testing.T) {
 	if err := cmd.setupScadaConn(conf1); err != nil {
 		t.Fatalf("err: %s", err)
 	}
-	list := cmd.scadaHttp.listener.(*scadaListener)
-	if list == nil || list.addr.infra != "hashicorp/test1" {
-		t.Fatalf("bad: %#v", list)
-	}
 	http1 := cmd.scadaHttp
 	provider1 := cmd.scadaProvider
 
@@ -287,10 +394,6 @@ func TestSetupScadaConn(t *testing.T) {
 	}
 	if cmd.scadaHttp == http1 || cmd.scadaProvider == provider1 {
 		t.Fatalf("should change: %#v %#v", cmd.scadaHttp, cmd.scadaProvider)
-	}
-	list = cmd.scadaHttp.listener.(*scadaListener)
-	if list == nil || list.addr.infra != "hashicorp/test2" {
-		t.Fatalf("bad: %#v", list)
 	}
 
 	// Original provider and listener must be closed
@@ -335,5 +438,31 @@ func TestProtectDataDir(t *testing.T) {
 	}
 	if out := ui.ErrorWriter.String(); !strings.Contains(out, dir) {
 		t.Fatalf("expected mdb dir error, got: %s", out)
+	}
+}
+
+func TestBadDataDirPermissions(t *testing.T) {
+	dir, err := ioutil.TempDir("", "consul")
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	defer os.RemoveAll(dir)
+
+	dataDir := filepath.Join(dir, "mdb")
+	if err := os.MkdirAll(dataDir, 0400); err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	defer os.RemoveAll(dataDir)
+
+	ui := new(cli.MockUi)
+	cmd := &Command{
+		Ui:   ui,
+		args: []string{"-data-dir=" + dataDir, "-server=true"},
+	}
+	if conf := cmd.readConfig(); conf != nil {
+		t.Fatalf("Should fail with bad data directory permissions")
+	}
+	if out := ui.ErrorWriter.String(); !strings.Contains(out, "Permission denied") {
+		t.Fatalf("expected permission denied error, got: %s", out)
 	}
 }

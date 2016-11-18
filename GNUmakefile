@@ -1,22 +1,34 @@
-GOTOOLS = github.com/mitchellh/gox golang.org/x/tools/cmd/stringer \
-	github.com/jteeuwen/go-bindata/... github.com/elazarl/go-bindata-assetfs/...
-PACKAGES=$(shell go list ./... | grep -v '^github.com/hashicorp/consul/vendor/')
+GOTOOLS = \
+	github.com/elazarl/go-bindata-assetfs/... \
+	github.com/jteeuwen/go-bindata/... \
+	github.com/mitchellh/gox \
+	golang.org/x/tools/cmd/cover \
+	golang.org/x/tools/cmd/stringer
+PACKAGES=$(shell go list ./... | grep -v '/vendor/')
 VETARGS?=-asmdecl -atomic -bool -buildtags -copylocks -methods \
          -nilfunc -printf -rangeloops -shift -structtags -unsafeptr
-VERSION?=$(shell awk -F\" '/^const Version/ { print $$2; exit }' version.go)
+BUILD_TAGS?=consul
 
 # all builds binaries for all targets
-all: tools
+all: bin
+
+ci:
+	if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then \
+		$(MAKE) bin ;\
+	fi
+	@$(MAKE) test
+
+bin: tools
 	@mkdir -p bin/
-	@sh -c "'$(CURDIR)/scripts/build.sh'"
+	@BUILD_TAGS='$(BUILD_TAGS)' sh -c "'$(CURDIR)/scripts/build.sh'"
 
 # dev creates binaries for testing locally - these are put into ./bin and $GOPATH
 dev: format
-	@CONSUL_DEV=1 sh -c "'$(CURDIR)/scripts/build.sh'"
+	@CONSUL_DEV=1 BUILD_TAGS='$(BUILD_TAGS)' sh -c "'$(CURDIR)/scripts/build.sh'"
 
 # dist builds binaries for all platforms and packages them for distribution
 dist:
-	@sh -c "'$(CURDIR)/scripts/dist.sh' $(VERSION)"
+	@BUILD_TAGS='$(BUILD_TAGS)' sh -c "'$(CURDIR)/scripts/dist.sh'"
 
 cov:
 	gocov test ./... | gocov-html > /tmp/coverage.html
@@ -25,7 +37,7 @@ cov:
 test: format
 	@$(MAKE) vet
 	@./scripts/verify_no_uuid.sh
-	@./scripts/test.sh
+	@BUILD_TAGS='$(BUILD_TAGS)' sh -c "'$(CURDIR)/scripts/test.sh'"
 
 cover:
 	go list ./... | xargs -n1 go test --cover
@@ -35,12 +47,9 @@ format:
 	@go fmt $(PACKAGES)
 
 vet:
-	@go tool vet 2>/dev/null ; if [ $$? -eq 3 ]; then \
-		go get golang.org/x/tools/cmd/vet; \
-	fi
 	@echo "--> Running go tool vet $(VETARGS) ."
 	@go list ./... \
-		| grep -v ^github.com/hashicorp/consul/vendor/ \
+		| grep -v /vendor/ \
 		| cut -d '/' -f 4- \
 		| xargs -n1 \
 			go tool vet $(VETARGS) ;\
@@ -49,6 +58,11 @@ vet:
 		echo "Vet found suspicious constructs. Please check the reported constructs"; \
 		echo "and fix them if necessary before submitting the code for reviewal."; \
 	fi
+
+# build the static web ui and build static assets inside a Docker container, the
+# same way a release build works
+ui:
+	@sh -c "'$(CURDIR)/scripts/ui.sh'"
 
 # generates the static web ui that's compiled into the binary
 static-assets:
@@ -60,4 +74,4 @@ static-assets:
 tools:
 	go get -u -v $(GOTOOLS)
 
-.PHONY: all bin dev dist cov test cover format vet static-assets tools
+.PHONY: all ci bin dev dist cov test cover format vet ui static-assets tools

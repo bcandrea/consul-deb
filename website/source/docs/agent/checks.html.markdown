@@ -20,7 +20,11 @@ There are five different kinds of checks:
 * Script + Interval - These checks depend on invoking an external application
   that performs the health check, exits with an appropriate exit code, and potentially
   generates some output. A script is paired with an invocation interval (e.g.
-  every 30 seconds). This is similar to the Nagios plugin system.
+  every 30 seconds). This is similar to the Nagios plugin system. The output of
+  a script check is limited to 4K. Output larger than this will be truncated.
+  By default, Script checks will be configured with a timeout equal to 30 seconds.
+  It is possible to configure a custom Script check timeout value by specifying the
+  `timeout` field in the check definition.
 
 * HTTP + Interval - These checks make an HTTP `GET` request every Interval (e.g.
   every 30 seconds) to the specified URL. The status of the service depends on the HTTP response code:
@@ -29,21 +33,26 @@ There are five different kinds of checks:
   to check a simple HTTP operation. By default, HTTP checks will be configured
   with a request timeout equal to the check interval, with a max of 10 seconds.
   It is possible to configure a custom HTTP check timeout value by specifying
-  the `timeout` field in the check definition.
+  the `timeout` field in the check definition. The output of the check is
+  limited to roughly 4K. Responses larger than this will be truncated. HTTP checks
+  also support SSL. By default, a valid SSL certificate is expected. Certificate
+  verification can be turned off by setting the `tls_skip_verify` field to `true`
+  in the check definition.
 
 * TCP + Interval - These checks make an TCP connection attempt every Interval
-  (e.g. every 30 seconds) to the specified IP/hostname and port. The status of
-  the service depends on whether the connection attempt is successful (ie - the
-  port is currently accepting connections). If the connection is accepted, the
-  status is `success`, otherwise the status is `critical`. In the case of a
-  hostname that resolves to both IPv4 and IPv6 addresses, an attempt will be
-  made to both addresses, and the first successful connection attempt will
-  result in a successful check. This type of check should be preferred over a
-  script that uses `netcat` or another external process to check a simple socket
-  operation. By default, TCP checks will be configured with a request timeout
-  equal to the check interval, with a max of 10 seconds. It is possible to
-  configure a custom TCP check timeout value by specifying the `timeout` field
-  in the check definition.
+  (e.g. every 30 seconds) to the specified IP/hostname and port. If no hostname
+  is specified, it defaults to "localhost". The status of the service depends on
+  whether the connection attempt is successful (ie - the port is currently
+  accepting connections). If the connection is accepted, the status is
+  `success`, otherwise the status is `critical`. In the case of a hostname that
+  resolves to both IPv4 and IPv6 addresses, an attempt will be made to both
+  addresses, and the first successful connection attempt will result in a
+  successful check. This type of check should be preferred over a script that
+  uses `netcat` or another external process to check a simple socket operation.
+  By default, TCP checks will be configured with a request timeout equal to the
+  check interval, with a max of 10 seconds. It is possible to configure a custom
+  TCP check timeout value by specifying the `timeout` field in the check
+  definition.
 
 * <a name="TTL"></a>Time to Live (TTL) - These checks retain their last known state for a given TTL.
   The state of the check must be updated periodically over the HTTP interface. If an
@@ -60,15 +69,16 @@ There are five different kinds of checks:
   last known status of the check across restarts. Persisted check status is
   valid through the end of the TTL from the time of the last check.
 
-* Docker + Interval - These checks depend on invoking an external application which 
-is packaged within a Docker Container. The application is triggered within the running 
-container via the Docker Exec API. We expect that the Consul agent user has access 
-to either the Docker HTTP API or the unix socket. Consul uses ```$DOCKER_HOST``` to 
-determine the Docker API endpoint. The application is expected to run, perform a health 
-check of the service running inside the container, and exit with an appropriate exit code. 
-The check should be paired with an invocation interval. The shell on which the check 
-has to be performed is configurable which makes it possible to run containers which 
-have different shells on the same host.  
+* Docker + Interval - These checks depend on invoking an external application which
+is packaged within a Docker Container. The application is triggered within the running
+container via the Docker Exec API. We expect that the Consul agent user has access
+to either the Docker HTTP API or the unix socket. Consul uses ```$DOCKER_HOST``` to
+determine the Docker API endpoint. The application is expected to run, perform a health
+check of the service running inside the container, and exit with an appropriate exit code.
+The check should be paired with an invocation interval. The shell on which the check
+has to be performed is configurable which makes it possible to run containers which
+have different shells on the same host. Check output for Docker is limited to
+4K. Any output larger than this will be truncated.
 
 ## Check Definition
 
@@ -80,7 +90,8 @@ A script check:
     "id": "mem-util",
     "name": "Memory utilization",
     "script": "/usr/local/bin/check_mem.py",
-    "interval": "10s"
+    "interval": "10s",
+    "timeout": "1s"
   }
 }
 ```
@@ -161,6 +172,16 @@ parsed by Go's `time` package, and has the following
 > A duration string is a possibly signed sequence of decimal numbers, each with
 > optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
 > Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+
+In Consul 0.7 and later, checks that are associated with a service may also contain
+an optional `deregister_critical_service_after` field, which is a timeout in the
+same Go time format as `interval` and `ttl`. If a check is in the critical state
+for more than this configured value, then its associated service (and all of its
+associated checks) will automatically be deregistered. The minimum timeout is 1
+minute, and the process that reaps critical services runs every 30 seconds, so it
+may take slightly longer than the configured timeout to trigger the deregistration.
+This should generally be configured with a timeout that's much, much longer than
+any expected recoverable outage for the given service.
 
 To configure a check, either provide it as a `-config-file` option to the
 agent or place it inside the `-config-dir` of the agent. The file must

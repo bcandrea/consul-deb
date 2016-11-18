@@ -34,7 +34,7 @@ func TestCatalogRegister(t *testing.T) {
 	var out struct{}
 
 	err := msgpackrpc.CallWithCodec(codec, "Catalog.Register", &arg, &out)
-	if err == nil || err.Error() != "No cluster leader" {
+	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
@@ -198,7 +198,7 @@ func TestCatalogDeregister(t *testing.T) {
 	var out struct{}
 
 	err := msgpackrpc.CallWithCodec(codec, "Catalog.Deregister", &arg, &out)
-	if err == nil || err.Error() != "No cluster leader" {
+	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
@@ -281,18 +281,11 @@ func TestCatalogListDatacenters_DistanceSort(t *testing.T) {
 	// coordinates, so the best we can do is make sure that the sorting
 	// function is getting called (it's tested extensively in rtt_test.go).
 	// Since this is relative to dc1, it will be listed first (proving we
-	// went into the sort fn) and the other two will be sorted by name since
-	// there are no known coordinates for them.
+	// went into the sort fn).
 	if len(out) != 3 {
 		t.Fatalf("bad: %v", out)
 	}
 	if out[0] != "dc1" {
-		t.Fatalf("bad: %v", out)
-	}
-	if out[1] != "acdc" {
-		t.Fatalf("bad: %v", out)
-	}
-	if out[2] != "dc2" {
 		t.Fatalf("bad: %v", out)
 	}
 }
@@ -309,7 +302,7 @@ func TestCatalogListNodes(t *testing.T) {
 	}
 	var out structs.IndexedNodes
 	err := msgpackrpc.CallWithCodec(codec, "Catalog.ListNodes", &args, &out)
-	if err == nil || err.Error() != "No cluster leader" {
+	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
@@ -628,7 +621,7 @@ func TestCatalogListServices(t *testing.T) {
 	}
 	var out structs.IndexedServices
 	err := msgpackrpc.CallWithCodec(codec, "Catalog.ListServices", &args, &out)
-	if err == nil || err.Error() != "No cluster leader" {
+	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
@@ -817,7 +810,7 @@ func TestCatalogListServiceNodes(t *testing.T) {
 	}
 	var out structs.IndexedServiceNodes
 	err := msgpackrpc.CallWithCodec(codec, "Catalog.ServiceNodes", &args, &out)
-	if err == nil || err.Error() != "No cluster leader" {
+	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
@@ -864,7 +857,7 @@ func TestCatalogListServiceNodes_DistanceSort(t *testing.T) {
 	}
 	var out structs.IndexedServiceNodes
 	err := msgpackrpc.CallWithCodec(codec, "Catalog.ServiceNodes", &args, &out)
-	if err == nil || err.Error() != "No cluster leader" {
+	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
@@ -951,7 +944,7 @@ func TestCatalogNodeServices(t *testing.T) {
 	}
 	var out structs.IndexedNodeServices
 	err := msgpackrpc.CallWithCodec(codec, "Catalog.NodeServices", &args, &out)
-	if err == nil || err.Error() != "No cluster leader" {
+	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
@@ -1008,7 +1001,7 @@ func TestCatalogRegister_FailedCase1(t *testing.T) {
 	var out struct{}
 
 	err := msgpackrpc.CallWithCodec(codec, "Catalog.Register", &arg, &out)
-	if err == nil || err.Error() != "No cluster leader" {
+	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 

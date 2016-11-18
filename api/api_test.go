@@ -2,11 +2,13 @@ package api
 
 import (
 	crand "crypto/rand"
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"testing"
 	"time"
@@ -121,6 +123,98 @@ func TestDefaultConfig_env(t *testing.T) {
 	}
 }
 
+func TestSetupTLSConfig(t *testing.T) {
+	// A default config should result in a clean default client config.
+	tlsConfig := &TLSConfig{}
+	cc, err := SetupTLSConfig(tlsConfig)
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	expected := &tls.Config{}
+	if !reflect.DeepEqual(cc, expected) {
+		t.Fatalf("bad: %v", cc)
+	}
+
+	// Try some address variations with and without ports.
+	tlsConfig.Address = "127.0.0.1"
+	cc, err = SetupTLSConfig(tlsConfig)
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	expected.ServerName = "127.0.0.1"
+	if !reflect.DeepEqual(cc, expected) {
+		t.Fatalf("bad: %v", cc)
+	}
+
+	tlsConfig.Address = "127.0.0.1:80"
+	cc, err = SetupTLSConfig(tlsConfig)
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	expected.ServerName = "127.0.0.1"
+	if !reflect.DeepEqual(cc, expected) {
+		t.Fatalf("bad: %v", cc)
+	}
+
+	tlsConfig.Address = "demo.consul.io:80"
+	cc, err = SetupTLSConfig(tlsConfig)
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	expected.ServerName = "demo.consul.io"
+	if !reflect.DeepEqual(cc, expected) {
+		t.Fatalf("bad: %v", cc)
+	}
+
+	tlsConfig.Address = "[2001:db8:a0b:12f0::1]"
+	cc, err = SetupTLSConfig(tlsConfig)
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	expected.ServerName = "[2001:db8:a0b:12f0::1]"
+	if !reflect.DeepEqual(cc, expected) {
+		t.Fatalf("bad: %v", cc)
+	}
+
+	tlsConfig.Address = "[2001:db8:a0b:12f0::1]:80"
+	cc, err = SetupTLSConfig(tlsConfig)
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	expected.ServerName = "2001:db8:a0b:12f0::1"
+	if !reflect.DeepEqual(cc, expected) {
+		t.Fatalf("bad: %v", cc)
+	}
+
+	// Skip verification.
+	tlsConfig.InsecureSkipVerify = true
+	cc, err = SetupTLSConfig(tlsConfig)
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	expected.InsecureSkipVerify = true
+	if !reflect.DeepEqual(cc, expected) {
+		t.Fatalf("bad: %v", cc)
+	}
+
+	// Make a new config that hits all the file parsers.
+	tlsConfig = &TLSConfig{
+		CertFile: "../test/hostname/Alice.crt",
+		KeyFile:  "../test/hostname/Alice.key",
+		CAFile:   "../test/hostname/CertAuth.crt",
+	}
+	cc, err = SetupTLSConfig(tlsConfig)
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	if len(cc.Certificates) != 1 {
+		t.Fatalf("missing certificate: %v", cc.Certificates)
+	}
+	if cc.RootCAs == nil {
+		t.Fatalf("didn't load root CAs")
+	}
+}
+
 func TestSetQueryOptions(t *testing.T) {
 	t.Parallel()
 	c, s := makeClient(t)
@@ -153,8 +247,8 @@ func TestSetQueryOptions(t *testing.T) {
 	if r.params.Get("wait") != "100000ms" {
 		t.Fatalf("bad: %v", r.params)
 	}
-	if r.params.Get("token") != "12345" {
-		t.Fatalf("bad: %v", r.params)
+	if r.header.Get("X-Consul-Token") != "12345" {
+		t.Fatalf("bad: %v", r.header)
 	}
 	if r.params.Get("near") != "nodex" {
 		t.Fatalf("bad: %v", r.params)
@@ -176,8 +270,8 @@ func TestSetWriteOptions(t *testing.T) {
 	if r.params.Get("dc") != "foo" {
 		t.Fatalf("bad: %v", r.params)
 	}
-	if r.params.Get("token") != "23456" {
-		t.Fatalf("bad: %v", r.params)
+	if r.header.Get("X-Consul-Token") != "23456" {
+		t.Fatalf("bad: %v", r.header)
 	}
 }
 
@@ -212,6 +306,7 @@ func TestParseQueryMeta(t *testing.T) {
 	resp.Header.Set("X-Consul-Index", "12345")
 	resp.Header.Set("X-Consul-LastContact", "80")
 	resp.Header.Set("X-Consul-KnownLeader", "true")
+	resp.Header.Set("X-Consul-Translate-Addresses", "true")
 
 	qm := &QueryMeta{}
 	if err := parseQueryMeta(resp, qm); err != nil {
@@ -225,6 +320,9 @@ func TestParseQueryMeta(t *testing.T) {
 		t.Fatalf("Bad: %v", qm)
 	}
 	if !qm.KnownLeader {
+		t.Fatalf("Bad: %v", qm)
+	}
+	if !qm.AddressTranslationEnabled {
 		t.Fatalf("Bad: %v", qm)
 	}
 }

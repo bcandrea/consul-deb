@@ -32,6 +32,7 @@ import (
 	"sync"
 
 	"github.com/hashicorp/consul/consul/structs"
+	"github.com/hashicorp/consul/logger"
 	"github.com/hashicorp/go-msgpack/codec"
 	"github.com/hashicorp/logutils"
 	"github.com/hashicorp/serf/serf"
@@ -91,12 +92,6 @@ type handshakeRequest struct {
 	Version int32
 }
 
-type eventRequest struct {
-	Name     string
-	Payload  []byte
-	Coalesce bool
-}
-
 type forceLeaveRequest struct {
 	Node string
 }
@@ -149,10 +144,6 @@ type monitorRequest struct {
 	LogLevel string
 }
 
-type streamRequest struct {
-	Type string
-}
-
 type stopRequest struct {
 	Stop uint64
 }
@@ -161,20 +152,12 @@ type logRecord struct {
 	Log string
 }
 
-type userEventRecord struct {
-	Event    string
-	LTime    serf.LamportTime
-	Name     string
-	Payload  []byte
-	Coalesce bool
-}
-
 type Member struct {
 	Name        string
 	Addr        net.IP
-	Port        uint16
 	Tags        map[string]string
 	Status      string
+	Port        uint16
 	ProtocolMin uint8
 	ProtocolMax uint8
 	ProtocolCur uint8
@@ -183,18 +166,13 @@ type Member struct {
 	DelegateCur uint8
 }
 
-type memberEventRecord struct {
-	Event   string
-	Members []Member
-}
-
 type AgentRPC struct {
 	sync.Mutex
 	agent     *Agent
 	clients   map[string]*rpcClient
 	listener  net.Listener
 	logger    *log.Logger
-	logWriter *logWriter
+	logWriter *logger.LogWriter
 	reloadCh  chan struct{}
 	stop      bool
 	stopCh    chan struct{}
@@ -241,7 +219,7 @@ func (c *rpcClient) String() string {
 
 // NewAgentRPC is used to create a new Agent RPC handler
 func NewAgentRPC(agent *Agent, listener net.Listener,
-	logOutput io.Writer, logWriter *logWriter) *AgentRPC {
+	logOutput io.Writer, logWriter *logger.LogWriter) *AgentRPC {
 	if logOutput == nil {
 		logOutput = os.Stderr
 	}
@@ -346,7 +324,7 @@ func (i *AgentRPC) handleClient(client *rpcClient) {
 				// The second part of this if is to block socket
 				// errors from Windows which appear to happen every
 				// time there is an EOF.
-				if err != io.EOF && !strings.Contains(err.Error(), "WSARecv") {
+				if err != io.EOF && !strings.Contains(strings.ToLower(err.Error()), "wsarecv") {
 					i.logger.Printf("[ERR] agent.rpc: failed to decode request header: %v", err)
 				}
 			}
@@ -536,9 +514,9 @@ func (i *AgentRPC) handleMonitor(client *rpcClient, seq uint64) error {
 	req.LogLevel = strings.ToUpper(req.LogLevel)
 
 	// Create a level filter
-	filter := LevelFilter()
+	filter := logger.LevelFilter()
 	filter.MinLevel = logutils.LogLevel(req.LogLevel)
-	if !ValidateLevelFilter(filter.MinLevel, filter) {
+	if !logger.ValidateLevelFilter(filter.MinLevel, filter) {
 		resp.Error = fmt.Sprintf("Unknown log level: %s", filter.MinLevel)
 		goto SEND
 	}

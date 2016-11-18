@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 set -e
 
 PROJECT="consul"
@@ -28,11 +28,8 @@ if ! command -v "s3cmd" >/dev/null 2>&1; then
   exit 1
 fi
 
-# Get the parent directory of where this script is and change into our website
-# directory
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
-DIR="$(cd -P "$( dirname "$SOURCE" )/.." && pwd)"
+# Get the parent directory of where this script is and cd there
+DIR="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 
 # Delete any .DS_Store files for our OS X friends.
 find "$DIR" -type f -name '.DS_Store' -delete
@@ -61,6 +58,32 @@ if [ -z "$NO_UPLOAD" ]; then
     --add-header="Cache-Control: max-age=31536000" \
     --add-header="x-amz-meta-surrogate-key: site-$PROJECT" \
     sync "$DIR/build/" "s3://hc-sites/$PROJECT/latest/"
+
+  # The s3cmd guessed mime type for text files is often wrong. This is
+  # problematic for some assets, so force their mime types to be correct.
+  echo "Overriding javascript mime-types..."
+  s3cmd \
+    --mime-type="application/javascript" \
+    --exclude "*" \
+    --include "*.js" \
+    --recursive \
+    modify "s3://hc-sites/$PROJECT/latest/"
+
+  echo "Overriding css mime-types..."
+  s3cmd \
+    --mime-type="text/css" \
+    --exclude "*" \
+    --include "*.css" \
+    --recursive \
+    modify "s3://hc-sites/$PROJECT/latest/"
+
+  echo "Overriding svg mime-types..."
+  s3cmd \
+    --mime-type="image/svg+xml" \
+    --exclude "*" \
+    --include "*.svg" \
+    --recursive \
+    modify "s3://hc-sites/$PROJECT/latest/"
 fi
 
 # Perform a soft-purge of the surrogate key.
@@ -80,6 +103,13 @@ fi
 # Warm the cache with recursive wget.
 if [ -z "$NO_WARM" ]; then
   echo "Warming Fastly cache..."
+  echo ""
+  echo "If this step fails, there are likely missing or broken assets or links"
+  echo "on the website. Run the following command manually on your laptop, and"
+  echo "search for \"ERROR\" in the output:"
+  echo ""
+  echo "wget --recursive --delete-after https://$PROJECT_URL/"
+  echo ""
   wget \
     --recursive \
     --delete-after \

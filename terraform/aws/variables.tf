@@ -8,6 +8,7 @@ variable "user" {
         ubuntu  = "ubuntu"
         rhel6   = "ec2-user"
         centos6 = "centos"
+        centos7 = "centos"
         rhel7   = "ec2-user"
     }
 }
@@ -16,6 +17,7 @@ variable "ami" {
     description           = "AWS AMI Id, if you change, make sure it is compatible with instance type, not all AMIs allow all instance types "
     default = {
         us-east-1-ubuntu  = "ami-fce3c696"
+        us-west-1-ubuntu  = "ami-a9a8e4c9"
         us-west-2-ubuntu  = "ami-9abea4fb"
         eu-west-1-ubuntu = "ami-47a23a30"
         eu-central-1-ubuntu = "ami-accff2b1"
@@ -28,6 +30,8 @@ variable "ami" {
         us-west-2-centos6 = "ami-1255b321"
         us-east-1-rhel7   = "ami-2051294a"
         us-west-2-rhel7   = "ami-775e4f16"
+        us-east-1-centos7 = "ami-6d1c2007"
+        us-west-1-centos7 = "ami-af4333cf"
     }
 }
 
@@ -36,6 +40,7 @@ variable "service_conf" {
     ubuntu  = "debian_upstart.conf"
     rhel6   = "rhel_upstart.conf"
     centos6 = "rhel_upstart.conf"
+    centos7 = "rhel_consul.service"
     rhel7   = "rhel_consul.service"
   }
 }
@@ -44,6 +49,7 @@ variable "service_conf_dest" {
     ubuntu  = "upstart.conf"
     rhel6   = "upstart.conf"
     centos6 = "upstart.conf"
+    centos7 = "consul.service"
     rhel7   = "consul.service"
   }
 }

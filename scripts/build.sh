@@ -3,7 +3,6 @@
 # This script builds the application from source for multiple platforms.
 set -e
 
-export GO15VENDOREXPERIMENT=1
 export CGO_ENABLED=0
 
 # Get the parent directory of where this script is.
@@ -15,9 +14,10 @@ DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
 cd "$DIR"
 
 # Get the git commit
-GIT_COMMIT=$(git rev-parse HEAD)
-GIT_DIRTY=$(test -n "`git status --porcelain`" && echo "+CHANGES" || true)
-GIT_DESCRIBE=$(git describe --tags)
+GIT_COMMIT="$(git rev-parse --short HEAD)"
+GIT_DIRTY="$(test -n "`git status --porcelain`" && echo "+CHANGES" || true)"
+GIT_DESCRIBE="$(git describe --tags --always)"
+GIT_IMPORT="github.com/hashicorp/consul/version"
 
 # Determine the arch/os combos we're building for
 XC_ARCH=${XC_ARCH:-"386 amd64 arm"}
@@ -37,11 +37,13 @@ fi
 
 # Build!
 echo "==> Building..."
-$GOPATH/bin/gox \
+"`which gox`" \
     -os="${XC_OS}" \
     -arch="${XC_ARCH}" \
-    -ldflags "-X main.GitCommit ${GIT_COMMIT}${GIT_DIRTY} -X main.GitDescribe ${GIT_DESCRIBE}" \
+    -osarch="!darwin/arm" \
+    -ldflags "-X ${GIT_IMPORT}.GitCommit='${GIT_COMMIT}${GIT_DIRTY}' -X ${GIT_IMPORT}.GitDescribe='${GIT_DESCRIBE}'" \
     -output "pkg/{{.OS}}_{{.Arch}}/consul" \
+    -tags="${BUILD_TAGS}" \
     .
 
 # Move all the compiled things to the $GOPATH/bin
