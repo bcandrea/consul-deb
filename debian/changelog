@@ -1,3 +1,9 @@
+consul (0.7.1-1~trusty1~ppa1) trusty; urgency=low
+
+  * New upstream release.
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Fri, 18 Nov 2016 23:22:27 +0000
+
 consul (0.6.4-2~xenial1~ppa1) xenial; urgency=low
 
   * No-change build for Xenial.
