@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN apt-get update && \
     apt-get install -y equivs ubuntu-dev-tools git-buildpackage software-properties-common && \
-    apt-add-repository ppa:ubuntu-lxc/lxd-stable && \
+    apt-add-repository ppa:gophers/archive && \
     apt-get update
 
 COPY build.sh /build.sh
