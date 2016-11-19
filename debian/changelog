@@ -1,3 +1,9 @@
+consul (0.7.1-1~yakkety1~ppa1) yakkety; urgency=low
+
+  * No-change build for Yakkety.
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Sat, 19 Nov 2016 00:56:12 +0000
+
 consul (0.7.1-1~xenial1~ppa1) xenial; urgency=low
 
   * No-change build for Xenial.
