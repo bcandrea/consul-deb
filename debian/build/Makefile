@@ -19,7 +19,7 @@ image: version tools
 	docker tag ubuntu:$(DISTRO) ubuntu:consul-deb-base
 	sh -c "docker build -t ubuntu:$(DISTRO)-consul-deb \
 		--build-arg VERSION=$(VERSION) \
-		--build-arg GIT_COMMIT=$(shell git rev-parse v$(VERSION)) \
+		--build-arg GIT_COMMIT=$(shell git rev-parse --short v$(VERSION)) \
 		$(CURDIR)"
 	docker rmi ubuntu:consul-deb-base
 
@@ -28,7 +28,7 @@ buildpackage: image
 
 buildsource: image gpgkey
 	$(MAKE) runcontainer \
-					CONTAINER_OPTS="-e GIT_BUILDPACKAGE_OPTIONS='--git-builder=debuild -eGOPATH -eGIT_DESCRIBE -eGIT_COMMIT -i -I -S -sa'"
+					CONTAINER_OPTS="-e GIT_BUILDPACKAGE_OPTIONS='--git-builder=debuild -eGOPATH -eGIT_IMPORT -eGIT_DESCRIBE -eGIT_COMMIT -eBUILD_TAGS -i -I -S -sa'"
 
 clean:
 	@sh -c 'dangling=$$(docker images -qf dangling=true); [ -n "$$dangling" ] && docker rmi $$dangling || true'

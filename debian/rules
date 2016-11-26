@@ -17,8 +17,10 @@ override_dh_auto_build:
 	ln -sf $(CURDIR) go/src/github.com/hashicorp/consul
 	PATH=$$PATH:/usr/lib/go-1.7/bin GOPATH=$(CURDIR)/go \
 		go build \
-		-ldflags "-X main.GitCommit=$${GIT_COMMIT} -X main.GitDescribe=$${GIT_DESCRIBE}" \
-		-o usr/bin/consul github.com/hashicorp/consul
+		-ldflags "-X $${GIT_IMPORT}.GitCommit=$${GIT_COMMIT} -X $${GIT_IMPORT}.GitDescribe=$${GIT_DESCRIBE}" \
+		-o usr/bin/consul \
+		-tags "$${BUILD_TAGS}" \
+		github.com/hashicorp/consul
 
 override_dh_installchangelogs:
 	dh_installchangelogs CHANGELOG.md
