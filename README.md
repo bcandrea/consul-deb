@@ -38,11 +38,18 @@ package by checking out the relevant tag:
     $ make -C debian/build
 
 Ubuntu packages built regularly with this Makefile are available at
-[this Launchpad PPA](https://launchpad.net/~bcandrea/+archive/ubuntu/consul). To
-install the latest Consul packages on your Ubuntu system you just need to add the
-repository and update the local sources:
+[this Launchpad PPA](https://launchpad.net/~bcandrea/+archive/ubuntu/consul) for
+releases up to 16.04 (Wily Werewolf), and at [this other PPA](https://launchpad.net/~bcandrea/+archive/ubuntu/consul-new) for Yakkety and
+newer. To install the latest Consul packages on your Ubuntu system you just need
+to add one of the repositories and update the local sources:
 
+    $ # For Trusty, Wily, Xenial
     $ sudo apt-add-repository ppa:bcandrea/consul
+    $ sudo apt-get update
+    $ sudo apt-get install consul consul-web-ui
+
+    $ # For Yakkety and newer
+    $ sudo apt-add-repository ppa:bcandrea/consul-new
     $ sudo apt-get update
     $ sudo apt-get install consul consul-web-ui
 
