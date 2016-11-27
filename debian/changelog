@@ -1,3 +1,9 @@
+consul (0.7.1-1~yakkety1~ppa2) yakkety; urgency=low
+
+  * Fix build script to display correct version (fixes #14).
+
+ -- Andrea Bernardo Ciddio <bcandrea@gmail.com>  Sun, 27 Nov 2016 00:09:27 +0000
+
 consul (0.7.1-1~xenial1~ppa2) xenial; urgency=low
 
   * Fix build script to display correct version (fixes #14).
