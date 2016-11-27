@@ -10,7 +10,9 @@
 #export DH_VERBOSE=1
 
 override_dh_auto_clean:
+	dh_auto_clean
 	rm -rf go usr/bin usr/share etc
+	[ ! -f debian/manpages/consul.1 ] || rm debian/manpages/consul.1
 
 override_dh_auto_build:
 	mkdir -p go/src/github.com/hashicorp go/pkg usr/bin
@@ -26,6 +28,10 @@ override_dh_installchangelogs:
 	dh_installchangelogs CHANGELOG.md
 
 override_dh_auto_test:
+
+override_dh_installman:
+	pandoc -s -t man $(CURDIR)/debian/manpages/consul.md -o $(CURDIR)/debian/manpages/consul.1
+	dh_installman
 
 override_dh_auto_install:
 	mkdir -p usr/share/consul

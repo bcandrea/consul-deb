@@ -1,11 +1,16 @@
-consul(1) -- Service discovery and configuration tool
-=====================================================
+% CONSUL(1) Service discovery and configuration tool
+% HashiCorp <hello@hashicorp.com>
+% 2016
 
-## SYNOPSIS
+# NAME
+
+Consul - Service discovery and configuration tool
+
+# SYNOPSIS
 
 `consul` [--version] [--help] <command> [<args>]
 
-## DESCRIPTION
+# DESCRIPTION
 
 Consul is a tool for service discovery and configuration. Consul is distributed, highly available, and extremely scalable. Consul provides several key features:
 
@@ -17,7 +22,7 @@ Consul is a tool for service discovery and configuration. Consul is distributed,
 
 * Multi-Datacenter - Consul is built to be datacenter aware, and can support any number of regions without complex configuration.
 
-## COMMANDS
+# COMMANDS
 
 * `agent`:
   Runs a Consul agent
@@ -46,6 +51,9 @@ Consul is a tool for service discovery and configuration. Consul is distributed,
 * `keyring`:
   Manages gossip layer encryption keys
 
+* `kv`:
+  Interact with the key-value store
+
 * `leave`:
   Gracefully leaves the Consul cluster and shuts down
 
@@ -61,11 +69,17 @@ Consul is a tool for service discovery and configuration. Consul is distributed,
 * `monitor`:
   Stream logs from a Consul agent
 
+* `operator`:
+  Provides cluster-level tools for Consul operators
+
 * `reload`:
   Triggers the agent to reload configuration files
 
 * `rtt`:
   Estimates network round trip time between nodes
+
+* `snapshot`:
+  Saves, restores and inspects snapshots of Consul server state
 
 * `version`:
   Prints the Consul version
@@ -73,7 +87,7 @@ Consul is a tool for service discovery and configuration. Consul is distributed,
 * `watch`:
   Watch for changes in Consul
 
-## OPTIONS
+# OPTIONS
 
 * `-h`, `--help`:
   Show this help message and exit
@@ -81,10 +95,10 @@ Consul is a tool for service discovery and configuration. Consul is distributed,
 * `-v`, `--version`:
   Print Consul version and exit
 
-## COPYRIGHT
+# COPYRIGHT
 
 Consul is subject to the terms of the Mozilla Public License, v. 2.0. (MPL-2.0)
 
-## SEE ALSO
+# SEE ALSO
 
 Consul online documentation is available on this website https://www.consul.io/docs/
