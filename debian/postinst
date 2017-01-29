@@ -15,6 +15,7 @@ case "$1" in
       fi
 
       chown -R consul: /etc/consul.d
+      chown -R consul: /var/lib/consul
 
     ;;
 esac
