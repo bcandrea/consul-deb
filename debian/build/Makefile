@@ -50,7 +50,7 @@ upload: version tools
 
 runcontainer:
 	mkdir -p /tmp/consul-deb
-	docker run -it --rm \
+	docker run -i --rm \
 		-v ~/.devscripts:/root/.devscripts \
 		-v ~/.gnupg:/root/.gnupg \
 		-v $(PKGDIR):/opt/consul-deb:ro \
